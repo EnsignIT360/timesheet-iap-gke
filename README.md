@@ -6,6 +6,8 @@ A small full-stack employee timesheet app built with React, Express, Docker, and
 
 **Starting point:** [4.4 Team Lab 2 repository](https://github.com/EnsignIT360/timesheet-k8s-secure-architecture).
 
+**Google Cloud project:** [team-lab-1-3 Console dashboard](https://console.cloud.google.com/home/dashboard?cloudshell=true&project=team-lab-1-3).
+
 ## Current GKE baseline before IAP
 
 The app is deployed to the `timesheet-gke` cluster in `us-central1`, in the `timesheet` namespace. The frontend is exposed through a `LoadBalancer`; the backend remains behind an internal `ClusterIP` service. Both deployments are available with one running pod each. The backend and frontend pods run as non-root with dropped Linux capabilities and read-only root filesystems.
@@ -51,6 +53,7 @@ Run these commands in Cloud Shell. They reuse the existing `timesheet-gke` clust
 gcloud config set project team-lab-1-3
 gcloud services enable iap.googleapis.com compute.googleapis.com cloudresourcemanager.googleapis.com iam.googleapis.com
 gcloud container clusters get-credentials timesheet-gke --region us-central1 --project team-lab-1-3
+cd ~
 git clone https://github.com/EnsignIT360/timesheet-iap-gke.git
 cd timesheet-iap-gke
 kubectl apply -k k8s/
