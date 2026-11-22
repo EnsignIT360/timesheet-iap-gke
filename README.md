@@ -1,10 +1,16 @@
-# Fieldwork Timesheet
+# 4.4 Team Lab 2: Deploying the Timesheet App to Kubernetes with Secure Architecture
 
-**Assignment:** 4.3 Team Lab 1 Building and Containerizing a Full-Stack Timesheet Application
+This is a new project repo for Lab 2, based on our working 4.3 timesheet app and current GKE deployment. We will use this baseline to implement and document the secure Kubernetes architecture required for this lab.
 
 A small full-stack employee timesheet app built with React, Express, Docker, and Kubernetes. Team members can submit hours and see the latest entries and running total.
 
-## Submission evidence
+**Starting point:** [4.3 Team Lab 1 repository](https://github.com/EnsignIT360/timesheet-app).
+
+## Current GKE baseline
+
+The existing app is deployed to the `timesheet-gke` cluster in `us-central1`, in the `timesheet` namespace. The frontend and backend are exposed inside the cluster through `ClusterIP` services; the current demo is accessed using `kubectl port-forward`. The manifests in `k8s/` are the starting point for the secure architecture work.
+
+## Baseline screenshots from Lab 1
 
 ### Docker containers
 
@@ -18,7 +24,7 @@ The frontend container is running, and the backend container is healthy.
 
 ![Timesheet UI showing one submitted entry](screenshots/timesheet-ui-one-entry.png)
 
-GitHub repository: [EnsignIT360/timesheet-app](https://github.com/EnsignIT360/timesheet-app).
+GitHub repository: [EnsignIT360/timesheet-k8s-secure-architecture](https://github.com/EnsignIT360/timesheet-k8s-secure-architecture).
 
 ## Run the whole app with Docker
 
