@@ -8,6 +8,24 @@ A small full-stack employee timesheet app built with React, Express, Docker, and
 
 **Google Cloud project:** [team-lab-1-3 Console dashboard](https://console.cloud.google.com/home/dashboard?cloudshell=true&project=team-lab-1-3).
 
+## Lab 3 evidence
+
+### IAP sign-in prompt
+
+![Google sign-in account chooser for the IAP-protected timesheet app](screenshots/lab3/iap-login-prompt.png)
+
+### Authorized account access
+
+![Timesheet app loaded through HTTPS with the API connected](screenshots/lab3/authorized-app.png)
+
+### Unauthorized account denied
+
+![IAP denied the authenticated account without the IAP access role](screenshots/lab3/access-denied.png)
+
+### IAP role assignment
+
+![IAP-secured Web App User role assigned to authorized accounts](screenshots/lab3/iam-role-assignment.png)
+
 ## Current GKE baseline before IAP
 
 The app is deployed to the `timesheet-gke` cluster in `us-central1`, in the `timesheet` namespace. The frontend is exposed through a `LoadBalancer`; the backend remains behind an internal `ClusterIP` service. Both deployments are available with one running pod each. The backend and frontend pods run as non-root with dropped Linux capabilities and read-only root filesystems.
@@ -85,24 +103,27 @@ kubectl -n timesheet get services
 kubectl -n timesheet get ingress
 ```
 
-In Logs Explorer, use this query to find IAP authentication/access events and capture the results:
-
-```text
-resource.type="iap_web"
-```
-
-Save Lab 3 screenshots under `screenshots/lab3/` and add them to the evidence list below. IAP on GKE uses a GKE Ingress and a `BackendConfig` associated with its frontend service; the service annotation activates the IAP configuration. See [Google's GKE IAP guide](https://cloud.google.com/iap/docs/enabling-kubernetes-howto).
+Save Lab 3 screenshots under `screenshots/lab3/`. IAP on GKE uses a GKE Ingress and a `BackendConfig` associated with its frontend service; the service annotation activates the IAP configuration. See [Google's GKE IAP guide](https://cloud.google.com/iap/docs/enabling-kubernetes-howto).
 
 ### Compliance mapping: ISO/IEC 27001
 
 IAP requires users to authenticate with a Google account before reaching the timesheet application, and IAM grants the IAP access role only to approved users. This supports ISO/IEC 27001 access-control and accountability objectives by enforcing identity-based, least-privilege access and producing access records for review. IAP supports these controls but does not, by itself, make the application or organization compliant.
 
-### Lab 3 evidence to add
+### Lab 3 evidence status
 
-- IAP login prompt and authorized access
-- [Access denied for an authenticated account without the IAP role](screenshots/lab3/access-denied.png)
-- IAM role assignment for `roles/iap.httpsResourceAccessor`
-- Cloud Logging records for IAP authentication events
+- [x] IAP sign-in prompt
+- [x] Authorized account access
+- [x] [Access denied for an authenticated account without the IAP role](screenshots/lab3/access-denied.png)
+- [x] [IAM role assignment for `roles/iap.httpsResourceAccessor`](screenshots/lab3/iam-role-assignment.png)
+- [ ] Cloud Logging records for IAP authentication events
+
+To capture access events, open [Logs Explorer](https://console.cloud.google.com/logs/query?project=team-lab-1-3), select the `Compute Engine Backend Service` resource and the `data_access` log type, and set the time range to include your authorized and denied tests. You can also run this query:
+
+```text
+protoPayload.serviceName="iap.googleapis.com"
+```
+
+Expand matching entries to show the principal and whether access was granted, then capture the results. Google's [IAP access logging guide](https://cloud.google.com/iap/docs/cloud-iap-context-aware-access-howto) describes where authorized and unauthorized request entries appear in Logs Explorer.
 
 #### Unauthorized account denied
 
