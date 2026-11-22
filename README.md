@@ -100,9 +100,13 @@ IAP requires users to authenticate with a Google account before reaching the tim
 ### Lab 3 evidence to add
 
 - IAP login prompt and authorized access
-- Access denied for an authenticated account without the IAP role
+- [Access denied for an authenticated account without the IAP role](screenshots/lab3/access-denied.png)
 - IAM role assignment for `roles/iap.httpsResourceAccessor`
 - Cloud Logging records for IAP authentication events
+
+#### Unauthorized account denied
+
+![IAP denied access to the authenticated test account without the IAP role](screenshots/lab3/access-denied.png)
 
 Google Cloud references: [IAP for GKE](https://cloud.google.com/iap/docs/enabling-kubernetes-howto), [GKE Ingress configuration](https://cloud.google.com/kubernetes-engine/docs/how-to/ingress-configuration), [custom OAuth clients for IAP](https://cloud.google.com/iap/docs/custom-oauth-configuration), and [IAP audit logs](https://cloud.google.com/iap/docs/audit-log-howto).
 
