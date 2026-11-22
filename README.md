@@ -1,16 +1,16 @@
-# 4.4 Team Lab 2: Deploying the Timesheet App to Kubernetes with Secure Architecture
+# 4.5 Team Lab 3: Securing Kubernetes Application with Google Identity-Aware Proxy (IAP)
 
-This is a new project repo for Lab 2, based on our working 4.3 timesheet app and current GKE deployment. We will use this baseline to implement and document the secure Kubernetes architecture required for this lab.
+This project carries forward the working timesheet app and GKE deployment from Lab 2. The current public frontend is the baseline for adding Google Identity-Aware Proxy (IAP) access control in this lab.
 
 A small full-stack employee timesheet app built with React, Express, Docker, and Kubernetes. Team members can submit hours and see the latest entries and running total.
 
-**Starting point:** [4.3 Team Lab 1 repository](https://github.com/EnsignIT360/timesheet-app).
+**Starting point:** [4.4 Team Lab 2 repository](https://github.com/EnsignIT360/timesheet-k8s-secure-architecture).
 
-## Current GKE baseline
+## Current GKE baseline before IAP
 
 The app is deployed to the `timesheet-gke` cluster in `us-central1`, in the `timesheet` namespace. The frontend is exposed through a `LoadBalancer`; the backend remains behind an internal `ClusterIP` service. Both deployments are available with one running pod each. The backend and frontend pods run as non-root with dropped Linux capabilities and read-only root filesystems.
 
-**Live app:** [http://34.10.228.36](http://34.10.228.36)
+**Current frontend:** [http://34.10.228.36](http://34.10.228.36)
 
 ![Timesheet app running through the GKE external IP with the API connected](screenshots/lab2/external-ip-app.png)
 
@@ -20,7 +20,7 @@ Both deployments are available, both pods are running, and the frontend LoadBala
 
 ![Cloud Shell output for deployments, pods, and services in the timesheet namespace](screenshots/lab2/kubernetes-resources.png)
 
-## Baseline screenshots from Lab 1
+## Baseline evidence from Lab 2
 
 ### Docker containers
 
@@ -34,7 +34,7 @@ The frontend container is running, and the backend container is healthy.
 
 ![Timesheet UI showing one submitted entry](screenshots/timesheet-ui-one-entry.png)
 
-GitHub repository: [EnsignIT360/timesheet-k8s-secure-architecture](https://github.com/EnsignIT360/timesheet-k8s-secure-architecture).
+GitHub repository: [EnsignIT360/timesheet-iap-gke](https://github.com/EnsignIT360/timesheet-iap-gke).
 
 ## Run the whole app with Docker
 
