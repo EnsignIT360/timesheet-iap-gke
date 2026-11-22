@@ -14,6 +14,25 @@ The app is deployed to the `timesheet-gke` cluster in `us-central1`, in the `tim
 
 ![Timesheet app running through the GKE external IP with the API connected](screenshots/lab2/external-ip-app.png)
 
+## Lab 3 IAP plan
+
+The current endpoint is the pre-IAP baseline. The Lab 3 deployment will use a GKE-managed HTTPS Ingress with IAP configured on its backend. The backend API will remain internal. After the IAP endpoint is verified, remove the old public frontend `LoadBalancer` service so it cannot bypass IAP.
+
+IAP on GKE requires a domain name pointed at the HTTPS load balancer. The OAuth client secret will be stored in a Kubernetes Secret and must not be committed to this repository. Configure the OAuth consent screen for external users if the authorized test account is outside the project's Google organization.
+
+### Compliance mapping: ISO/IEC 27001
+
+IAP requires users to authenticate with a Google account before reaching the timesheet application, and IAM grants the IAP access role only to approved users. This supports ISO/IEC 27001 access-control and accountability objectives by enforcing identity-based, least-privilege access and producing access records for review. IAP supports these controls but does not, by itself, make the application or organization compliant.
+
+### Lab 3 evidence to add
+
+- IAP login prompt and authorized access
+- Access denied for an authenticated account without the IAP role
+- IAM role assignment for `roles/iap.httpsResourceAccessor`
+- Cloud Logging records for IAP authentication events
+
+Google Cloud references: [IAP for GKE](https://cloud.google.com/iap/docs/enabling-kubernetes-howto), [GKE Ingress configuration](https://cloud.google.com/kubernetes-engine/docs/how-to/ingress-configuration), [custom OAuth clients for IAP](https://cloud.google.com/iap/docs/custom-oauth-configuration), and [IAP audit logs](https://cloud.google.com/iap/docs/audit-log-howto).
+
 ### Kubernetes deployment verification
 
 Both deployments are available, both pods are running, and the frontend LoadBalancer has an external IP.
