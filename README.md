@@ -8,6 +8,10 @@ A small full-stack employee timesheet app built with React, Express, Docker, and
 
 **Google Cloud project:** [team-lab-1-3 Console dashboard](https://console.cloud.google.com/home/dashboard?cloudshell=true&project=team-lab-1-3).
 
+## Compliance summary: ISO/IEC 27001
+
+Google IAP protects the Timesheet app by asking people to sign in with Google and checking whether their account has permission before letting them in. We give access only to approved accounts. IAP audit logs record access and permission activity so it can be reviewed. These steps support ISO/IEC 27001 security goals, but using IAP by itself does not make our app or team certified or compliant. [Google Cloud IAP overview](https://docs.cloud.google.com/iap/docs/concepts-overview), [IAP audit logging](https://docs.cloud.google.com/iap/docs/audit-log-howto), [ISO/IEC 27001](https://www.iso.org/standard/27001)
+
 ## Lab 3 evidence
 
 ### IAP sign-in prompt
@@ -108,10 +112,6 @@ kubectl -n timesheet get ingress
 ```
 
 Save Lab 3 screenshots under `screenshots/lab3/`. IAP on GKE uses a GKE Ingress and a `BackendConfig` associated with its frontend service; the service annotation activates the IAP configuration. See [Google's GKE IAP guide](https://cloud.google.com/iap/docs/enabling-kubernetes-howto).
-
-### Compliance summary: ISO/IEC 27001
-
-Google IAP protects the Timesheet app by asking people to sign in with Google and checking whether their account has permission before letting them in. We give access only to approved accounts. IAP audit logs record access and permission activity so it can be reviewed. These steps support ISO/IEC 27001 security goals, but using IAP by itself does not make our app or team certified or compliant. [Google Cloud IAP overview](https://docs.cloud.google.com/iap/docs/concepts-overview), [IAP audit logging](https://docs.cloud.google.com/iap/docs/audit-log-howto), [ISO/IEC 27001](https://www.iso.org/standard/27001)
 
 ### Lab 3 evidence status
 
