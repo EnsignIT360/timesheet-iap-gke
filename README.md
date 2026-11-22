@@ -109,9 +109,9 @@ kubectl -n timesheet get ingress
 
 Save Lab 3 screenshots under `screenshots/lab3/`. IAP on GKE uses a GKE Ingress and a `BackendConfig` associated with its frontend service; the service annotation activates the IAP configuration. See [Google's GKE IAP guide](https://cloud.google.com/iap/docs/enabling-kubernetes-howto).
 
-### Sample compliance summary: ISO/IEC 27001
+### Compliance summary: ISO/IEC 27001
 
-> Google Identity-Aware Proxy (IAP) protects the Timesheet app by requiring users to sign in with Google and checking their IAM permissions before allowing access. Assigning the IAP-secured Web App User role only to approved accounts supports identity-based access control, while IAP audit logs can help track access and policy activity. These measures support security practices relevant to an information security management system, but using IAP alone does not make the app or team ISO/IEC 27001 compliant or certified. [Google Cloud IAP overview](https://docs.cloud.google.com/iap/docs/concepts-overview), [IAP audit logging](https://docs.cloud.google.com/iap/docs/audit-log-howto), [ISO/IEC 27001](https://www.iso.org/standard/27001)
+Google IAP protects the Timesheet app by asking people to sign in with Google and checking whether their account has permission before letting them in. We give access only to approved accounts. IAP audit logs record access and permission activity so it can be reviewed. These steps support ISO/IEC 27001 security goals, but using IAP by itself does not make our app or team certified or compliant. [Google Cloud IAP overview](https://docs.cloud.google.com/iap/docs/concepts-overview), [IAP audit logging](https://docs.cloud.google.com/iap/docs/audit-log-howto), [ISO/IEC 27001](https://www.iso.org/standard/27001)
 
 ### Lab 3 evidence status
 
