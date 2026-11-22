@@ -8,7 +8,11 @@ A small full-stack employee timesheet app built with React, Express, Docker, and
 
 ## Current GKE baseline
 
-The existing app is deployed to the `timesheet-gke` cluster in `us-central1`, in the `timesheet` namespace. Its Lab 1 baseline used `ClusterIP` services and port forwarding. For Lab 2, the frontend service will use a `LoadBalancer` to receive an external IP, while the backend remains behind an internal `ClusterIP` service. The backend and frontend pods also run as non-root with dropped Linux capabilities and read-only root filesystems.
+The app is deployed to the `timesheet-gke` cluster in `us-central1`, in the `timesheet` namespace. The frontend is exposed through a `LoadBalancer`; the backend remains behind an internal `ClusterIP` service. Both deployments are available with one running pod each. The backend and frontend pods run as non-root with dropped Linux capabilities and read-only root filesystems.
+
+**Live app:** [http://34.10.228.36](http://34.10.228.36)
+
+![Timesheet app running through the GKE external IP with the API connected](screenshots/lab2/external-ip-app.png)
 
 ## Baseline screenshots from Lab 1
 
