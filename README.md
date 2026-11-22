@@ -14,6 +14,12 @@ The app is deployed to the `timesheet-gke` cluster in `us-central1`, in the `tim
 
 ![Timesheet app running through the GKE external IP with the API connected](screenshots/lab2/external-ip-app.png)
 
+### Kubernetes deployment verification
+
+Both deployments are available, both pods are running, and the frontend LoadBalancer has an external IP.
+
+![Cloud Shell output for deployments, pods, and services in the timesheet namespace](screenshots/lab2/kubernetes-resources.png)
+
 ## Baseline screenshots from Lab 1
 
 ### Docker containers
