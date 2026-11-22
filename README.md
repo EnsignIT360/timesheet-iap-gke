@@ -14,11 +14,81 @@ The app is deployed to the `timesheet-gke` cluster in `us-central1`, in the `tim
 
 ![Timesheet app running through the GKE external IP with the API connected](screenshots/lab2/external-ip-app.png)
 
-## Lab 3 IAP plan
+## Deploy Lab 3 with IAP
 
-The current endpoint is the pre-IAP baseline. The Lab 3 deployment will use a GKE-managed HTTPS Ingress with IAP configured on its backend. The backend API will remain internal. After the IAP endpoint is verified, remove the old public frontend `LoadBalancer` service so it cannot bypass IAP.
+The Lab 3 manifests use a GKE-managed HTTPS Ingress, Google-managed TLS certificate, and a GKE `BackendConfig` that enables IAP. The frontend Service is `ClusterIP`, and the backend API remains internal. This removes the old public frontend `LoadBalancer` path so it cannot bypass IAP.
 
-IAP on GKE requires a domain name pointed at the HTTPS load balancer. The OAuth client secret will be stored in a Kubernetes Secret and must not be committed to this repository. Configure the OAuth consent screen for external users if the authorized test account is outside the project's Google organization.
+The hostname `it360-45.ensign.quest` points to the reserved global IP `8.232.145.4` (`timesheet-iap-ip`). Keep this IP reservation and DNS A record in place. The Google-managed certificate can take time to become active after the Ingress is created. The OAuth client secret is stored in a Kubernetes Secret and must not be committed to this repository.
+
+### 1. Configure OAuth
+
+In Google Cloud Console, open **Google Auth Platform** and configure the app branding/consent screen. Select **External** if the test accounts are outside a Google Workspace organization. If the app is in Testing mode, add both the authorized and unauthorized test accounts as OAuth test users so that the unauthorized account can complete sign-in and receive an IAP access-denied result.
+
+Create an OAuth client with application type **Web application**. Add this exact authorized redirect URI, replacing `YOUR_CLIENT_ID` with the generated client ID:
+
+```text
+https://iap.googleapis.com/v1/oauth/clientIds/YOUR_CLIENT_ID:handleRedirect
+```
+
+In Cloud Shell, create the Kubernetes secret without putting the secret in Git or this chat. Enter the credentials at the prompts; the client secret input is hidden:
+
+```bash
+read -rp "OAuth client ID: " IAP_CLIENT_ID
+read -rsp "OAuth client secret: " IAP_CLIENT_SECRET; echo
+kubectl -n timesheet create secret generic timesheet-iap-oauth \
+  --from-literal=client_id="$IAP_CLIENT_ID" \
+  --from-literal=client_secret="$IAP_CLIENT_SECRET"
+unset IAP_CLIENT_ID IAP_CLIENT_SECRET
+```
+
+If the secret already exists, use `kubectl -n timesheet delete secret timesheet-iap-oauth` before recreating it.
+
+### 2. Apply the IAP ingress
+
+Run these commands in Cloud Shell. They reuse the existing `timesheet-gke` cluster and project:
+
+```bash
+gcloud config set project team-lab-1-3
+gcloud services enable iap.googleapis.com compute.googleapis.com cloudresourcemanager.googleapis.com iam.googleapis.com
+gcloud container clusters get-credentials timesheet-gke --region us-central1 --project team-lab-1-3
+git clone https://github.com/EnsignIT360/timesheet-iap-gke.git
+cd timesheet-iap-gke
+kubectl apply -k k8s/
+kubectl -n timesheet rollout status deployment/timesheet-backend --timeout=5m
+kubectl -n timesheet rollout status deployment/timesheet-frontend --timeout=5m
+kubectl -n timesheet get ingress,managedcertificate,backendconfig,services
+```
+
+The service should change to `ClusterIP` and the Ingress will provision a Google HTTPS load balancer on `8.232.145.4`. Check progress with:
+
+```bash
+kubectl -n timesheet describe ingress timesheet-iap
+kubectl -n timesheet describe managedcertificate timesheet-iap-cert
+kubectl -n timesheet get events --sort-by=.lastTimestamp
+```
+
+Wait until the Ingress has address `8.232.145.4` and the managed certificate reports `Active`, then open [https://it360-45.ensign.quest](https://it360-45.ensign.quest). Certificate provisioning may take up to an hour. The previous direct frontend IP `34.10.228.36` is no longer a supported access path after the frontend Service changes to `ClusterIP`.
+
+### 3. Grant IAP access and verify
+
+In **Security > Identity-Aware Proxy** in Google Cloud Console, locate the generated HTTPS backend service. Add only the authorized account with **Cloud IAP > IAP-secured Web App User** (`roles/iap.httpsResourceAccessor`). Do not grant this role to the unauthorized test account. Google-managed OAuth clients only support users within the organization; use a custom OAuth client for external Google accounts.
+
+Verify that the authorized account can sign in and load the app, and that the unauthorized test account reaches the IAP access-denied page. Capture the prompt before sign-in and the denied result. For command-line evidence, capture:
+
+```bash
+kubectl -n timesheet get deployments
+kubectl -n timesheet get pods
+kubectl -n timesheet get services
+kubectl -n timesheet get ingress
+```
+
+In Logs Explorer, use this query to find IAP authentication/access events and capture the results:
+
+```text
+resource.type="iap_web"
+```
+
+Save Lab 3 screenshots under `screenshots/lab3/` and add them to the evidence list below. IAP on GKE uses a GKE Ingress and a `BackendConfig` associated with its frontend service; the service annotation activates the IAP configuration. See [Google's GKE IAP guide](https://cloud.google.com/iap/docs/enabling-kubernetes-howto).
 
 ### Compliance mapping: ISO/IEC 27001
 

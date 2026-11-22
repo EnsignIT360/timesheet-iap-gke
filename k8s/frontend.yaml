@@ -56,8 +56,10 @@ apiVersion: v1
 kind: Service
 metadata:
   name: timesheet-frontend
+  annotations:
+    cloud.google.com/backend-config: '{"default": "timesheet-iap"}'
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: timesheet-frontend
   ports:

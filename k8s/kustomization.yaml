@@ -5,6 +5,7 @@ resources:
   - namespace.yaml
   - backend.yaml
   - frontend.yaml
+  - iap.yaml
 images:
   - name: timesheet-backend
     newName: docker.io/dewfaced/timesheet-backend
