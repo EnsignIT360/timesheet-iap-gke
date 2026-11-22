@@ -26,6 +26,10 @@ A small full-stack employee timesheet app built with React, Express, Docker, and
 
 ![IAP-secured Web App User role assigned to authorized accounts](screenshots/lab3/iam-role-assignment.png)
 
+### IAP Cloud Audit Logs
+
+![Logs Explorer showing IAP SetIamPolicy audit entries for the backend service](screenshots/lab3/iap-audit-logs.png)
+
 ## Current GKE baseline before IAP
 
 The app is deployed to the `timesheet-gke` cluster in `us-central1`, in the `timesheet` namespace. The frontend is exposed through a `LoadBalancer`; the backend remains behind an internal `ClusterIP` service. Both deployments are available with one running pod each. The backend and frontend pods run as non-root with dropped Linux capabilities and read-only root filesystems.
@@ -115,7 +119,7 @@ IAP requires users to authenticate with a Google account before reaching the tim
 - [x] Authorized account access
 - [x] [Access denied for an authenticated account without the IAP role](screenshots/lab3/access-denied.png)
 - [x] [IAM role assignment for `roles/iap.httpsResourceAccessor`](screenshots/lab3/iam-role-assignment.png)
-- [ ] Cloud Logging records for IAP authentication events
+- [x] Cloud Logging IAP audit log evidence (the captured entries show `SetIamPolicy` events)
 
 To capture access events, open [Logs Explorer](https://console.cloud.google.com/logs/query?project=team-lab-1-3), select the `Compute Engine Backend Service` resource and the `data_access` log type, and set the time range to include your authorized and denied tests. You can also run this query:
 
