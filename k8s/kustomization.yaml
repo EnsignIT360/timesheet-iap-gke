@@ -7,8 +7,8 @@ resources:
   - frontend.yaml
 images:
   - name: timesheet-backend
-    newName: us-central1-docker.pkg.dev/PROJECT_ID/timesheets/timesheet-backend
+    newName: docker.io/dewfaced/timesheet-backend
     newTag: latest
   - name: timesheet-frontend
-    newName: us-central1-docker.pkg.dev/PROJECT_ID/timesheets/timesheet-frontend
+    newName: docker.io/dewfaced/timesheet-frontend
     newTag: latest

@@ -57,7 +57,7 @@ kind: Service
 metadata:
   name: timesheet-frontend
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   selector:
     app: timesheet-frontend
   ports:

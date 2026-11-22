@@ -8,7 +8,7 @@ A small full-stack employee timesheet app built with React, Express, Docker, and
 
 ## Current GKE baseline
 
-The existing app is deployed to the `timesheet-gke` cluster in `us-central1`, in the `timesheet` namespace. The frontend and backend are exposed inside the cluster through `ClusterIP` services; the current demo is accessed using `kubectl port-forward`. The manifests in `k8s/` are the starting point for the secure architecture work.
+The existing app is deployed to the `timesheet-gke` cluster in `us-central1`, in the `timesheet` namespace. Its Lab 1 baseline used `ClusterIP` services and port forwarding. For Lab 2, the frontend service will use a `LoadBalancer` to receive an external IP, while the backend remains behind an internal `ClusterIP` service. The backend and frontend pods also run as non-root with dropped Linux capabilities and read-only root filesystems.
 
 ## Baseline screenshots from Lab 1
 
@@ -67,60 +67,53 @@ Example request body:
 
 Entries are kept in backend memory, matching the lab guide. Restarting the backend clears the data.
 
-## Build containers individually
+## Build and publish the containers to Docker Hub
 
 ```bash
-docker build -t timesheet-backend ./backend
-docker build -t timesheet-frontend ./frontend
+docker login --username dewfaced
+docker build -t dewfaced/timesheet-backend:latest ./backend
+docker push dewfaced/timesheet-backend:latest
+docker build -t dewfaced/timesheet-frontend:latest ./frontend
+docker push dewfaced/timesheet-frontend:latest
 ```
 
-The frontend NGINX image proxies API requests to the `timesheet-backend` service on the same container network. Use Docker Compose to run the two containers together.
+The frontend NGINX image proxies API requests to the internal `backend` service on port 5000. The Kubernetes manifests use the public Docker Hub images shown above.
 
-## Deploy to Google Kubernetes Engine (GKE)
+## Deploy to the existing Google Kubernetes Engine cluster
 
-The manifests in `k8s/` deploy one backend replica behind an internal `ClusterIP` service named `backend` and one frontend replica behind an internal `ClusterIP` service. The browser uses the frontend's `/api` proxy, so the backend does not need a public IP or a billable public load balancer. Use `kubectl port-forward` to open the frontend locally.
+Use the existing `timesheet-gke` cluster in `us-central1`; this avoids creating a second cluster. Run the cluster commands in Google Cloud Shell, where your GKE credentials are configured.
 
-Prerequisites: Google Cloud CLI (`gcloud`), `kubectl`, a Google Cloud project with billing enabled, and permission to create GKE and Artifact Registry resources. Choose a region supported by your GKE setup. The commands below use `us-central1`.
-
-1. Set your project and region, then enable the APIs:
+1. Clone this Lab 2 repo in Cloud Shell if it is not already there:
 
    ```bash
-   gcloud config set project PROJECT_ID
-   gcloud services enable container.googleapis.com artifactregistry.googleapis.com
+   git clone https://github.com/EnsignIT360/timesheet-k8s-secure-architecture.git
+   cd timesheet-k8s-secure-architecture
    ```
 
-2. Create a Docker repository in Artifact Registry and configure Docker authentication:
+2. Connect to the existing cluster and apply the manifests:
 
    ```bash
-   gcloud artifacts repositories create timesheets --repository-format=docker --location=us-central1
-   gcloud auth configure-docker us-central1-docker.pkg.dev
-   ```
-
-3. Build and push both images. Replace `PROJECT_ID` with your Google Cloud project ID:
-
-   ```bash
-   docker build -t us-central1-docker.pkg.dev/PROJECT_ID/timesheets/timesheet-backend:latest ./backend
-   docker push us-central1-docker.pkg.dev/PROJECT_ID/timesheets/timesheet-backend:latest
-   docker build -t us-central1-docker.pkg.dev/PROJECT_ID/timesheets/timesheet-frontend:latest ./frontend
-   docker push us-central1-docker.pkg.dev/PROJECT_ID/timesheets/timesheet-frontend:latest
-   ```
-
-4. In `k8s/kustomization.yaml`, replace `PROJECT_ID` in both image paths with your project ID. If using a different region, update `us-central1` there too.
-
-5. Connect `kubectl` to your existing GKE cluster and deploy:
-
-   ```bash
-   gcloud container clusters get-credentials CLUSTER_NAME --region us-central1
+   gcloud config set project team-lab-1-3
+   gcloud container clusters get-credentials timesheet-gke --region us-central1 --project team-lab-1-3
    kubectl apply -k k8s/
-   kubectl -n timesheet get pods
-   kubectl -n timesheet port-forward service/timesheet-frontend 8080:80
+   kubectl -n timesheet rollout status deployment/timesheet-backend --timeout=5m
+   kubectl -n timesheet rollout status deployment/timesheet-frontend --timeout=5m
    ```
 
-   Open [http://localhost:8080](http://localhost:8080) in a browser. If the cluster is in a different project from Artifact Registry, grant the cluster's node service account the Artifact Registry Reader role for the image repository.
+3. Capture deployment evidence and wait for the external IP:
 
-The app stores entries in backend memory to match the lab guide. A backend restart clears them, so use a database before relying on GKE for durable timesheet records. GKE and external load balancers can incur Google Cloud charges.
+   ```bash
+   kubectl -n timesheet get deployments
+   kubectl -n timesheet get pods
+   kubectl -n timesheet get services
+   kubectl -n timesheet get service timesheet-frontend --watch
+   ```
 
-Google Cloud references: [GKE and Artifact Registry](https://cloud.google.com/artifact-registry/docs/integrate-gke) and [Docker authentication for Artifact Registry](https://cloud.google.com/artifact-registry/docs/docker/authentication).
+Stop the watch after `EXTERNAL-IP` is assigned, then open `http://EXTERNAL-IP` in a browser. The frontend is public; the backend remains internal to the cluster.
+
+Save screenshots of `get deployments`, `get pods`, and `get services` output, plus the app open through the external IP. Add them under `screenshots/lab2/` and include the external IP link in the submission.
+
+The app stores entries in backend memory, so a backend restart clears them. A GKE `LoadBalancer` service can incur cloud charges; remove the service or cluster after the lab if it is no longer needed.
 
 ## Team contributions
 
